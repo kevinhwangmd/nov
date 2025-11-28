@@ -1042,6 +1042,7 @@
                 const newProject = {
                     id: Date.now().toString(),
                     name: newProjectName,
+                    displayName: newProjectName,
                     scenes: [],
                     chapters: [],
                     characters: [],
@@ -1084,6 +1085,25 @@
                 setShowSaveAs(true);
             };
 
+            // Save counter functions
+            const getSaveCounter = (projectName) => {
+                const counters = JSON.parse(localStorage.getItem('novelatta_saveCounters') || '{}');
+                return counters[projectName] || 0;
+            };
+
+            const incrementSaveCounter = (projectName) => {
+                const counters = JSON.parse(localStorage.getItem('novelatta_saveCounters') || '{}');
+                counters[projectName] = (counters[projectName] || 0) + 1;
+                localStorage.setItem('novelatta_saveCounters', JSON.stringify(counters));
+                return counters[projectName];
+            };
+
+            const resetSaveCounter = (projectName) => {
+                const counters = JSON.parse(localStorage.getItem('novelatta_saveCounters') || '{}');
+                delete counters[projectName];
+                localStorage.setItem('novelatta_saveCounters', JSON.stringify(counters));
+            };
+
             const performSave = () => {
                 if (!currentProject) return;
                 if (!saveFileName.trim()) {
@@ -1091,14 +1111,36 @@
                     return;
                 }
                 
+                // Strip any trailing (number) from the filename
+                let cleanFileName = saveFileName.trim().replace(/\s*\(\d+\)$/, '');
+                
+                // Check if this is a new project name
+                const isNewName = !currentProject.name || currentProject.name !== cleanFileName;
+                if (isNewName) {
+                    resetSaveCounter(cleanFileName);
+                }
+                
+                const counter = incrementSaveCounter(cleanFileName);
+                const baseFilename = cleanFileName.endsWith('.novelatta') ? 
+                    cleanFileName.replace('.novelatta', '') : cleanFileName;
+                const filename = counter === 1 ? 
+                    `${baseFilename}.novelatta` : 
+                    `${baseFilename} (${counter - 1}).novelatta`;
+                
+                // Set display name to match the actual saved filename
+                const displayName = counter === 1 ? 
+                    baseFilename : 
+                    `${baseFilename} (${counter - 1})`;
+                
                 const updatedProject = {
                     ...currentProject,
-                    name: saveFileName
+                    name: cleanFileName,
+                    displayName: displayName
                 };
                 setCurrentProject(updatedProject);
                 
                 const dataStr = JSON.stringify({
-                    name: saveFileName,
+                    name: cleanFileName,
                     scenes: scenes,
                     chapters: chapters,
                     characters: characters,
@@ -1111,7 +1153,6 @@
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                const filename = saveFileName.endsWith('.novelatta') ? saveFileName : `${saveFileName}.novelatta`;
                 link.download = filename;
                 link.click();
                 URL.revokeObjectURL(url);
@@ -1137,8 +1178,23 @@
                 if (currentProject.name && currentProject.name.trim()) {
                     setSaveFileName(currentProject.name);
                     setShowSaveAs(false); // Ensure modal is closed
-                    // Call performSave directly with current project name
-                    const filename = currentProject.name.endsWith('.novelatta') ? currentProject.name : `${currentProject.name}.novelatta`;
+                    
+                    const counter = incrementSaveCounter(currentProject.name);
+                    const baseFilename = currentProject.name.endsWith('.novelatta') ? 
+                        currentProject.name.replace('.novelatta', '') : currentProject.name;
+                    const filename = counter === 1 ? 
+                        `${baseFilename}.novelatta` : 
+                        `${baseFilename} (${counter - 1}).novelatta`;
+                    
+                    // Set display name to match the actual saved filename
+                    const displayName = counter === 1 ? 
+                        baseFilename : 
+                        `${baseFilename} (${counter - 1})`;
+                    
+                    setCurrentProject({
+                        ...currentProject,
+                        displayName: displayName
+                    });
                     
                     const dataStr = JSON.stringify({
                         name: currentProject.name,
@@ -1206,7 +1262,8 @@
 
             const saveAsNewFile = () => {
                 if (!currentProject) return;
-                setSaveFileName(currentProject.name || '');
+                const baseName = (currentProject.name || '').replace(/\s*\(\d+\)$/, '');
+                setSaveFileName(baseName);
                 setShowSaveAs(true);
             };
 
@@ -1228,9 +1285,15 @@
                     try {
                         const data = JSON.parse(event.target.result);
                         
+                        // Get full filename for display
+                        const fullFileName = file.name.replace('.novelatta', '') || 'Imported Project';
+                        // Strip trailing (number) for clean base name used in counter logic
+                        const baseName = fullFileName.replace(/\s*\(\d+\)$/, '');
+                        
                         const newProject = {
                             id: Date.now().toString(),
-                            name: file.name.replace('.novelatta', '') || 'Imported Project',
+                            name: baseName,
+                            displayName: fullFileName,
                             scenes: data.scenes || [],
                             chapters: data.chapters || [],
                             characters: data.characters || [],
@@ -2323,7 +2386,7 @@
                                             gap: '8px'
                                         }}>
                                             <span>📄</span>
-                                            <span>{currentProject.name}</span>
+                                            <span>{currentProject.displayName || currentProject.name}</span>
                                             {unsavedChanges && (
                                                 <span style={{ 
                                                     fontSize: '14px', 
