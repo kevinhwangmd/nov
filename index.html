@@ -21,7 +21,7 @@
 
         /* Header Styles */
         .header {
-            background-color: #4f46e5;
+            background-color: #666699;
             color: white;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
@@ -891,6 +891,7 @@
         ];
 
         function App() {
+            const lastModified = "Nov 28, 2025";
             const [activeMainTab, setActiveMainTab] = useState('scenes'); // 'scenes', 'characters', 'locations'
             const [viewMode, setViewMode] = useState('card'); // 'card' or 'list' for characters/locations
             const [scenesViewMode, setScenesViewMode] = useState('card'); // 'card' or 'list' for scenes
@@ -3451,16 +3452,13 @@
                                         color: '#374151'
                                     }}>
                                         <p style={{ fontSize: '14px', marginBottom: '12px' }}>
-                                            Created by <strong>Kevin Hwang</strong>
-                                        </p>
-                                        <p style={{ fontSize: '14px', marginBottom: '12px' }}>
-                                            with <strong>Claude Sonnet 4 with Extended Thinking</strong>
+                                            Created by <strong>Kevin Hwang</strong> with <strong>Claude</strong>
                                         </p>
                                         <p style={{ fontSize: '14px', marginBottom: '20px' }}>
-                                            Nov 26, 2024
+                                            Nov 26, 2025
                                         </p>
                                         <p style={{ fontSize: '12px', color: '#6b7280', borderTop: '1px solid #e5e7eb', paddingTop: '16px' }}>
-                                            Last Modified: Nov 27, 2024
+                                            Last Modified: {lastModified}
                                         </p>
                                         <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '8px' }}>
                                             <a href="https://kevinhwang.com" target="_blank" rel="noopener noreferrer" style={{ color: '#4f46e5', textDecoration: 'none' }}>
@@ -3529,24 +3527,17 @@
                                 <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
                                     <button
                                         onClick={() => setShowNewProject(true)}
-                                        className="btn btn-primary"
-                                        style={{ fontSize: '16px', padding: '12px 24px' }}
+                                        className="btn"
+                                        style={{ fontSize: '16px', padding: '12px 24px', backgroundColor: '#666699', color: 'white' }}
                                     >
                                         + Create New Project
                                     </button>
                                     <button
                                         onClick={handleOpenProject}
-                                        className="btn btn-secondary"
-                                        style={{ fontSize: '16px', padding: '12px 24px' }}
+                                        className="btn"
+                                        style={{ fontSize: '16px', padding: '12px 24px', backgroundColor: '#666699', color: 'white' }}
                                     >
                                         📂 Open Project
-                                    </button>
-                                    <button
-                                        onClick={() => setShowAbout(true)}
-                                        className="btn btn-gray"
-                                        style={{ fontSize: '16px', padding: '12px 24px' }}
-                                    >
-                                        ? View Tutorial
                                     </button>
                                 </div>
                             </div>
@@ -4230,8 +4221,8 @@
                     )}
 
                     <footer className="footer">
-                        <p>Created by Kevin Hwang | Built with Claude Sonnet 4 with Extended Thinking</p>
-                        <p>Last Modified: November 26, 2024</p>
+                        <p>Created by Kevin Hwang with Claude</p>
+                        <p>Last Modified: {lastModified}</p>
                     </footer>
 
                     {/* Edit Modals */}
