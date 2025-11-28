@@ -3813,21 +3813,45 @@
                                                     ))}
 
                                                     {/* Unchaptered Scenes */}
-                                                    {getUnchapteredScenes(act).map(scene => (
-                                                        <SceneCard
-                                                            key={scene.id}
-                                                            scene={scene}
-                                                            isEditing={editingScene === scene.id}
-                                                            isDragging={draggedScene?.id === scene.id}
-                                                            onEdit={() => setEditingScene(scene.id)}
-                                                            onDone={() => setEditingScene(null)}
-                                                            onUpdate={(updates) => updateScene(scene.id, updates)}
-                                                            onDelete={() => deleteScene(scene.id)}
-                                                            onDragStart={handleSceneDragStart}
-                                                            onDragOver={handleSceneDragOver}
-                                                            onDrop={handleSceneDrop}
-                                                        />
-                                                    ))}
+                                                    {getUnchapteredScenes(act).length > 0 || draggedScene ? (
+                                                        <div 
+                                                            className="chapter-container"
+                                                            style={{ marginTop: '16px' }}
+                                                        >
+                                                            <div 
+                                                                className="chapter-header"
+                                                                onDragOver={(e) => handleSceneDragOver(e, `unchaptered-${act}`)}
+                                                                onDragLeave={handleSceneDragLeave}
+                                                                onDrop={(e) => handleSceneDrop(e, null, act, null)}
+                                                                style={{
+                                                                    backgroundColor: dragOverChapter === `unchaptered-${act}` ? '#eff6ff' : '#f3f4f6',
+                                                                    borderColor: dragOverChapter === `unchaptered-${act}` ? '#3b82f6' : '#6366f1',
+                                                                    borderStyle: 'dashed'
+                                                                }}
+                                                            >
+                                                                <div className="chapter-title">
+                                                                    Unchaptered Scenes
+                                                                </div>
+                                                            </div>
+                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
+                                                                {getUnchapteredScenes(act).map(scene => (
+                                                                    <SceneCard
+                                                                        key={scene.id}
+                                                                        scene={scene}
+                                                                        isEditing={editingScene === scene.id}
+                                                                        isDragging={draggedScene?.id === scene.id}
+                                                                        onEdit={() => setEditingScene(scene.id)}
+                                                                        onDone={() => setEditingScene(null)}
+                                                                        onUpdate={(updates) => updateScene(scene.id, updates)}
+                                                                        onDelete={() => deleteScene(scene.id)}
+                                                                        onDragStart={handleSceneDragStart}
+                                                                        onDragOver={handleSceneDragOver}
+                                                                        onDrop={handleSceneDrop}
+                                                                    />
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    ) : null}
 
                                                     {/* Add Scene Button */}
                                                     <button
