@@ -890,6 +890,18 @@
             { value: 'other', label: 'Other' }
         ];
 
+        // Auto-resize textarea function (global scope for all components)
+        const autoResizeTextarea = (textarea) => {
+            if (textarea) {
+                try {
+                    textarea.style.height = 'auto';
+                    textarea.style.height = textarea.scrollHeight + 'px';
+                } catch (error) {
+                    console.error('Error resizing textarea:', error);
+                }
+            }
+        };
+
         function App() {
             const lastModified = "Nov 28, 2025";
             const [activeMainTab, setActiveMainTab] = useState('scenes'); // 'scenes', 'characters', 'locations'
@@ -4498,52 +4510,80 @@
                     {scene.type === 'action' ? (
                         <>
                             <textarea
+                                ref={(el) => autoResizeTextarea(el)}
                                 value={scene.objective}
-                                onChange={(e) => onUpdate({ objective: e.target.value })}
+                                onChange={(e) => {
+                                    onUpdate({ objective: e.target.value });
+                                    autoResizeTextarea(e.target);
+                                }}
                                 placeholder="Objective: What does the character want?"
-                                style={{ width: '100%', minHeight: '50px', marginBottom: '6px', padding: '6px', fontSize: '13px' }}
+                                style={{ width: '100%', minHeight: '50px', marginBottom: '6px', padding: '6px', fontSize: '13px', resize: 'none', overflow: 'hidden' }}
                             />
                             <textarea
+                                ref={(el) => autoResizeTextarea(el)}
                                 value={scene.obstacle}
-                                onChange={(e) => onUpdate({ obstacle: e.target.value })}
+                                onChange={(e) => {
+                                    onUpdate({ obstacle: e.target.value });
+                                    autoResizeTextarea(e.target);
+                                }}
                                 placeholder="Obstacle: What stands in their way?"
-                                style={{ width: '100%', minHeight: '50px', marginBottom: '6px', padding: '6px', fontSize: '13px' }}
+                                style={{ width: '100%', minHeight: '50px', marginBottom: '6px', padding: '6px', fontSize: '13px', resize: 'none', overflow: 'hidden' }}
                             />
                             <textarea
+                                ref={(el) => autoResizeTextarea(el)}
                                 value={scene.outcome}
-                                onChange={(e) => onUpdate({ outcome: e.target.value })}
+                                onChange={(e) => {
+                                    onUpdate({ outcome: e.target.value });
+                                    autoResizeTextarea(e.target);
+                                }}
                                 placeholder="Outcome: What happens?"
-                                style={{ width: '100%', minHeight: '50px', marginBottom: '6px', padding: '6px', fontSize: '13px' }}
+                                style={{ width: '100%', minHeight: '50px', marginBottom: '6px', padding: '6px', fontSize: '13px', resize: 'none', overflow: 'hidden' }}
                             />
                         </>
                     ) : (
                         <>
                             <textarea
+                                ref={(el) => autoResizeTextarea(el)}
                                 value={scene.emotion}
-                                onChange={(e) => onUpdate({ emotion: e.target.value })}
+                                onChange={(e) => {
+                                    onUpdate({ emotion: e.target.value });
+                                    autoResizeTextarea(e.target);
+                                }}
                                 placeholder="Emotion: How do they feel?"
-                                style={{ width: '100%', minHeight: '50px', marginBottom: '6px', padding: '6px', fontSize: '13px' }}
+                                style={{ width: '100%', minHeight: '50px', marginBottom: '6px', padding: '6px', fontSize: '13px', resize: 'none', overflow: 'hidden' }}
                             />
                             <textarea
+                                ref={(el) => autoResizeTextarea(el)}
                                 value={scene.deliberation}
-                                onChange={(e) => onUpdate({ deliberation: e.target.value })}
+                                onChange={(e) => {
+                                    onUpdate({ deliberation: e.target.value });
+                                    autoResizeTextarea(e.target);
+                                }}
                                 placeholder="Deliberation: What do they consider?"
-                                style={{ width: '100%', minHeight: '50px', marginBottom: '6px', padding: '6px', fontSize: '13px' }}
+                                style={{ width: '100%', minHeight: '50px', marginBottom: '6px', padding: '6px', fontSize: '13px', resize: 'none', overflow: 'hidden' }}
                             />
                             <textarea
+                                ref={(el) => autoResizeTextarea(el)}
                                 value={scene.decision}
-                                onChange={(e) => onUpdate({ decision: e.target.value })}
+                                onChange={(e) => {
+                                    onUpdate({ decision: e.target.value });
+                                    autoResizeTextarea(e.target);
+                                }}
                                 placeholder="Decision: What do they decide?"
-                                style={{ width: '100%', minHeight: '50px', marginBottom: '6px', padding: '6px', fontSize: '13px' }}
+                                style={{ width: '100%', minHeight: '50px', marginBottom: '6px', padding: '6px', fontSize: '13px', resize: 'none', overflow: 'hidden' }}
                             />
                         </>
                     )}
 
                     <textarea
+                        ref={(el) => autoResizeTextarea(el)}
                         value={scene.notes}
-                        onChange={(e) => onUpdate({ notes: e.target.value })}
+                        onChange={(e) => {
+                            onUpdate({ notes: e.target.value });
+                            autoResizeTextarea(e.target);
+                        }}
                         placeholder="Notes..."
-                        style={{ width: '100%', minHeight: '40px', marginBottom: '12px', padding: '6px', fontSize: '13px' }}
+                        style={{ width: '100%', minHeight: '40px', marginBottom: '12px', padding: '6px', fontSize: '13px', resize: 'none', overflow: 'hidden' }}
                     />
 
                     <div style={{ 
@@ -5070,45 +5110,70 @@
                             <div className="form-group">
                                 <label className="form-label">Physical Description</label>
                                 <textarea
+                                    ref={(el) => autoResizeTextarea(el)}
                                     value={formData.description}
-                                    onChange={(e) => handleChange('description', e.target.value)}
+                                    onChange={(e) => {
+                                        handleChange('description', e.target.value);
+                                        autoResizeTextarea(e.target);
+                                    }}
                                     placeholder="Describe their appearance..."
+                                    style={{ resize: 'none', overflow: 'hidden' }}
                                 />
                             </div>
 
                             <div className="form-group">
                                 <label className="form-label">Personality</label>
                                 <textarea
+                                    ref={(el) => autoResizeTextarea(el)}
                                     value={formData.personality}
-                                    onChange={(e) => handleChange('personality', e.target.value)}
+                                    onChange={(e) => {
+                                        handleChange('personality', e.target.value);
+                                        autoResizeTextarea(e.target);
+                                    }}
                                     placeholder="Describe their personality traits..."
+                                    style={{ resize: 'none', overflow: 'hidden' }}
                                 />
                             </div>
 
                             <div className="form-group">
                                 <label className="form-label">Backstory</label>
                                 <textarea
+                                    ref={(el) => autoResizeTextarea(el)}
                                     value={formData.backstory}
-                                    onChange={(e) => handleChange('backstory', e.target.value)}
+                                    onChange={(e) => {
+                                        handleChange('backstory', e.target.value);
+                                        autoResizeTextarea(e.target);
+                                    }}
                                     placeholder="What's their history?"
+                                    style={{ resize: 'none', overflow: 'hidden' }}
                                 />
                             </div>
 
                             <div className="form-group">
                                 <label className="form-label">Character Arc</label>
                                 <textarea
+                                    ref={(el) => autoResizeTextarea(el)}
                                     value={formData.arc}
-                                    onChange={(e) => handleChange('arc', e.target.value)}
+                                    onChange={(e) => {
+                                        handleChange('arc', e.target.value);
+                                        autoResizeTextarea(e.target);
+                                    }}
                                     placeholder="How do they change throughout the story?"
+                                    style={{ resize: 'none', overflow: 'hidden' }}
                                 />
                             </div>
 
                             <div className="form-group">
                                 <label className="form-label">Relationships</label>
                                 <textarea
+                                    ref={(el) => autoResizeTextarea(el)}
                                     value={formData.relationships}
-                                    onChange={(e) => handleChange('relationships', e.target.value)}
+                                    onChange={(e) => {
+                                        handleChange('relationships', e.target.value);
+                                        autoResizeTextarea(e.target);
+                                    }}
                                     placeholder="Connections to other characters..."
+                                    style={{ resize: 'none', overflow: 'hidden' }}
                                 />
                             </div>
 
@@ -5125,9 +5190,14 @@
                             <div className="form-group">
                                 <label className="form-label">Notes</label>
                                 <textarea
+                                    ref={(el) => autoResizeTextarea(el)}
                                     value={formData.notes}
-                                    onChange={(e) => handleChange('notes', e.target.value)}
+                                    onChange={(e) => {
+                                        handleChange('notes', e.target.value);
+                                        autoResizeTextarea(e.target);
+                                    }}
                                     placeholder="Additional notes..."
+                                    style={{ resize: 'none', overflow: 'hidden' }}
                                 />
                             </div>
 
@@ -5333,18 +5403,28 @@
                             <div className="form-group">
                                 <label className="form-label">Description (Sensory Details & Atmosphere)</label>
                                 <textarea
+                                    ref={(el) => autoResizeTextarea(el)}
                                     value={formData.description}
-                                    onChange={(e) => handleChange('description', e.target.value)}
+                                    onChange={(e) => {
+                                        handleChange('description', e.target.value);
+                                        autoResizeTextarea(e.target);
+                                    }}
                                     placeholder="What does this place look, sound, smell, and feel like?"
+                                    style={{ resize: 'none', overflow: 'hidden' }}
                                 />
                             </div>
 
                             <div className="form-group">
                                 <label className="form-label">Significance to Story</label>
                                 <textarea
+                                    ref={(el) => autoResizeTextarea(el)}
                                     value={formData.significance}
-                                    onChange={(e) => handleChange('significance', e.target.value)}
+                                    onChange={(e) => {
+                                        handleChange('significance', e.target.value);
+                                        autoResizeTextarea(e.target);
+                                    }}
                                     placeholder="Why is this location important? What happens here?"
+                                    style={{ resize: 'none', overflow: 'hidden' }}
                                 />
                             </div>
 
@@ -5361,9 +5441,14 @@
                             <div className="form-group">
                                 <label className="form-label">Notes</label>
                                 <textarea
+                                    ref={(el) => autoResizeTextarea(el)}
                                     value={formData.notes}
-                                    onChange={(e) => handleChange('notes', e.target.value)}
+                                    onChange={(e) => {
+                                        handleChange('notes', e.target.value);
+                                        autoResizeTextarea(e.target);
+                                    }}
                                     placeholder="Additional notes..."
+                                    style={{ resize: 'none', overflow: 'hidden' }}
                                 />
                             </div>
 
@@ -5600,10 +5685,14 @@
                             <div className="form-group">
                                 <label className="form-label">Content</label>
                                 <textarea
+                                    ref={(el) => autoResizeTextarea(el)}
                                     value={formData.content}
-                                    onChange={(e) => handleChange('content', e.target.value)}
+                                    onChange={(e) => {
+                                        handleChange('content', e.target.value);
+                                        autoResizeTextarea(e.target);
+                                    }}
                                     placeholder="Your notes here..."
-                                    style={{ minHeight: '200px' }}
+                                    style={{ minHeight: '200px', resize: 'none', overflow: 'hidden' }}
                                 />
                             </div>
 
