@@ -908,6 +908,10 @@
             const [viewMode, setViewMode] = useState('card'); // 'card' or 'list' for characters/locations
             const [scenesViewMode, setScenesViewMode] = useState('card'); // 'card' or 'list' for scenes
             const [scenesSearchQuery, setScenesSearchQuery] = useState('');
+            const [sceneActFilter, setSceneActFilter] = useState([]); // Acts to show (empty = all)
+            const [sceneTypeFilter, setSceneTypeFilter] = useState([]); // Types to show (empty = all)
+            const [sceneColorFilter, setSceneColorFilter] = useState([]); // Colors to show (empty = all)
+            const [showSceneFilters, setShowSceneFilters] = useState(false); // Toggle filter panel
             const [projects, setProjects] = useState([]);
             const [currentProject, setCurrentProject] = useState(null);
             
@@ -951,26 +955,87 @@
 
             // Filter scenes by search query
             const getFilteredScenes = () => {
-                if (!scenesSearchQuery) return scenes;
+                let filtered = scenes;
                 
-                const query = scenesSearchQuery.toLowerCase();
-                return scenes.filter(scene => {
-                    const chapterName = scene.chapterId 
-                        ? chapters.find(c => c.id === scene.chapterId)?.name || ''
-                        : '';
-                    
-                    return (
-                        (scene.title && scene.title.toLowerCase().includes(query)) ||
-                        (scene.objective && scene.objective.toLowerCase().includes(query)) ||
-                        (scene.obstacle && scene.obstacle.toLowerCase().includes(query)) ||
-                        (scene.outcome && scene.outcome.toLowerCase().includes(query)) ||
-                        (scene.emotion && scene.emotion.toLowerCase().includes(query)) ||
-                        (scene.deliberation && scene.deliberation.toLowerCase().includes(query)) ||
-                        (scene.decision && scene.decision.toLowerCase().includes(query)) ||
-                        (scene.notes && scene.notes.toLowerCase().includes(query)) ||
-                        (chapterName && chapterName.toLowerCase().includes(query))
-                    );
-                });
+                // Apply act filter (empty = show all)
+                if (sceneActFilter.length > 0) {
+                    filtered = filtered.filter(scene => sceneActFilter.includes(scene.act));
+                }
+                
+                // Apply type filter (empty = show all)
+                if (sceneTypeFilter.length > 0) {
+                    filtered = filtered.filter(scene => sceneTypeFilter.includes(scene.type));
+                }
+                
+                // Apply color filter (empty = show all)
+                if (sceneColorFilter.length > 0) {
+                    filtered = filtered.filter(scene => sceneColorFilter.includes(scene.color));
+                }
+                
+                // Apply search query
+                if (scenesSearchQuery) {
+                    const query = scenesSearchQuery.toLowerCase();
+                    filtered = filtered.filter(scene => {
+                        const chapterName = scene.chapterId 
+                            ? chapters.find(c => c.id === scene.chapterId)?.name || ''
+                            : '';
+                        
+                        return (
+                            (scene.title && scene.title.toLowerCase().includes(query)) ||
+                            (scene.objective && scene.objective.toLowerCase().includes(query)) ||
+                            (scene.obstacle && scene.obstacle.toLowerCase().includes(query)) ||
+                            (scene.outcome && scene.outcome.toLowerCase().includes(query)) ||
+                            (scene.emotion && scene.emotion.toLowerCase().includes(query)) ||
+                            (scene.deliberation && scene.deliberation.toLowerCase().includes(query)) ||
+                            (scene.decision && scene.decision.toLowerCase().includes(query)) ||
+                            (scene.notes && scene.notes.toLowerCase().includes(query)) ||
+                            (chapterName && chapterName.toLowerCase().includes(query))
+                        );
+                    });
+                }
+                
+                return filtered;
+            };
+
+            // Filter helper functions
+            const toggleActFilter = (act) => {
+                if (sceneActFilter.includes(act)) {
+                    setSceneActFilter(sceneActFilter.filter(a => a !== act));
+                } else {
+                    setSceneActFilter([...sceneActFilter, act]);
+                }
+            };
+
+            const toggleTypeFilter = (type) => {
+                if (sceneTypeFilter.includes(type)) {
+                    setSceneTypeFilter(sceneTypeFilter.filter(t => t !== type));
+                } else {
+                    setSceneTypeFilter([...sceneTypeFilter, type]);
+                }
+            };
+
+            const toggleColorFilter = (color) => {
+                if (sceneColorFilter.includes(color)) {
+                    setSceneColorFilter(sceneColorFilter.filter(c => c !== color));
+                } else {
+                    setSceneColorFilter([...sceneColorFilter, color]);
+                }
+            };
+
+            const clearAllFilters = () => {
+                setSceneActFilter([]);
+                setSceneTypeFilter([]);
+                setSceneColorFilter([]);
+                setScenesSearchQuery('');
+            };
+
+            const hasActiveFilters = () => {
+                return (
+                    sceneActFilter.length > 0 ||
+                    sceneTypeFilter.length > 0 ||
+                    sceneColorFilter.length > 0 ||
+                    scenesSearchQuery !== ''
+                );
             };
 
             // Track unsaved changes
@@ -3660,6 +3725,7 @@
                                         onClick={() => {
                                             setActiveMainTab('characters');
                                             setScenesSearchQuery('');
+                                            setShowSceneFilters(false);
                                             setSearchQuery('');
                                         }}
                                     >
@@ -3670,6 +3736,7 @@
                                         onClick={() => {
                                             setActiveMainTab('locations');
                                             setScenesSearchQuery('');
+                                            setShowSceneFilters(false);
                                             setSearchQuery('');
                                         }}
                                     >
@@ -3680,6 +3747,7 @@
                                         onClick={() => {
                                             setActiveMainTab('notes');
                                             setScenesSearchQuery('');
+                                            setShowSceneFilters(false);
                                             setSearchQuery('');
                                         }}
                                     >
@@ -3704,17 +3772,35 @@
                                                         onChange={(e) => setScenesSearchQuery(e.target.value)}
                                                         style={{ maxWidth: '500px' }}
                                                     />
-                                                    {scenesSearchQuery && (
+                                                    <button
+                                                        onClick={() => setShowSceneFilters(!showSceneFilters)}
+                                                        className="btn btn-small"
+                                                        style={{ 
+                                                            backgroundColor: hasActiveFilters() ? '#4f46e5' : '#e5e7eb',
+                                                            color: hasActiveFilters() ? 'white' : '#374151',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: '6px'
+                                                        }}
+                                                    >
+                                                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                            <path d="M0 1C0 0.447715 0.447715 0 1 0H13C13.5523 0 14 0.447715 14 1V2.5C14 2.76522 13.8946 3.01957 13.7071 3.20711L9 8V13C9 13.3466 8.77614 13.6684 8.4472 13.7882L6.4472 14.5882C5.78231 14.8377 5 14.3543 5 13.8V8L0.292893 3.20711C0.105357 3.01957 0 2.76522 0 2.5V1Z" fill="currentColor"/>
+                                                        </svg>
+                                                        Filters {hasActiveFilters() && '●'}
+                                                    </button>
+                                                    {(scenesSearchQuery || hasActiveFilters()) && (
                                                         <>
                                                             <span style={{ fontSize: '13px', color: '#6b7280' }}>
                                                                 {getFilteredScenes().length} scene{getFilteredScenes().length !== 1 ? 's' : ''} match
                                                             </span>
-                                                            <button
-                                                                onClick={() => setScenesSearchQuery('')}
-                                                                className="btn btn-small btn-gray"
-                                                            >
-                                                                Clear
-                                                            </button>
+                                                            {hasActiveFilters() && (
+                                                                <button
+                                                                    onClick={clearAllFilters}
+                                                                    className="btn btn-small btn-gray"
+                                                                >
+                                                                    Clear All
+                                                                </button>
+                                                            )}
                                                         </>
                                                     )}
                                                 </div>
@@ -3733,6 +3819,140 @@
                                                     </button>
                                                 </div>
                                             </div>
+                                            
+                                            {/* Filter Panel */}
+                                            {showSceneFilters && (
+                                                <div style={{
+                                                    padding: '16px',
+                                                    borderTop: '1px solid #e5e7eb',
+                                                    backgroundColor: '#f9fafb'
+                                                }}>
+                                                    <div style={{ 
+                                                        display: 'flex', 
+                                                        gap: '32px',
+                                                        flexWrap: 'wrap',
+                                                        alignItems: 'flex-start'
+                                                    }}>
+                                                        {/* Act Filter */}
+                                                        <div>
+                                                            <div style={{ 
+                                                                fontSize: '13px', 
+                                                                fontWeight: 600, 
+                                                                color: '#374151',
+                                                                marginBottom: '8px'
+                                                            }}>
+                                                                Acts
+                                                            </div>
+                                                            <div style={{ display: 'flex', gap: '8px' }}>
+                                                                {[1, 2, 3, 4].map(act => (
+                                                                    <button
+                                                                        key={act}
+                                                                        onClick={() => toggleActFilter(act)}
+                                                                        style={{
+                                                                            padding: '6px 12px',
+                                                                            border: '2px solid',
+                                                                            borderColor: sceneActFilter.includes(act) ? '#4f46e5' : '#d1d5db',
+                                                                            borderRadius: '6px',
+                                                                            backgroundColor: sceneActFilter.includes(act) ? '#eff6ff' : 'white',
+                                                                            color: sceneActFilter.includes(act) ? '#4f46e5' : '#6b7280',
+                                                                            fontWeight: 600,
+                                                                            fontSize: '13px',
+                                                                            cursor: 'pointer',
+                                                                            transition: 'all 0.2s'
+                                                                        }}
+                                                                    >
+                                                                        Act {act}
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Type Filter */}
+                                                        <div>
+                                                            <div style={{ 
+                                                                fontSize: '13px', 
+                                                                fontWeight: 600, 
+                                                                color: '#374151',
+                                                                marginBottom: '8px'
+                                                            }}>
+                                                                Type
+                                                            </div>
+                                                            <div style={{ display: 'flex', gap: '8px' }}>
+                                                                <button
+                                                                    onClick={() => toggleTypeFilter('action')}
+                                                                    style={{
+                                                                        padding: '6px 12px',
+                                                                        border: '2px solid',
+                                                                        borderColor: sceneTypeFilter.includes('action') ? '#4f46e5' : '#d1d5db',
+                                                                        borderRadius: '6px',
+                                                                        backgroundColor: sceneTypeFilter.includes('action') ? '#eff6ff' : 'white',
+                                                                        color: sceneTypeFilter.includes('action') ? '#4f46e5' : '#6b7280',
+                                                                        fontWeight: 600,
+                                                                        fontSize: '13px',
+                                                                        cursor: 'pointer',
+                                                                        transition: 'all 0.2s'
+                                                                    }}
+                                                                >
+                                                                    ⚡ Action
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => toggleTypeFilter('reaction')}
+                                                                    style={{
+                                                                        padding: '6px 12px',
+                                                                        border: '2px solid',
+                                                                        borderColor: sceneTypeFilter.includes('reaction') ? '#4f46e5' : '#d1d5db',
+                                                                        borderRadius: '6px',
+                                                                        backgroundColor: sceneTypeFilter.includes('reaction') ? '#eff6ff' : 'white',
+                                                                        color: sceneTypeFilter.includes('reaction') ? '#4f46e5' : '#6b7280',
+                                                                        fontWeight: 600,
+                                                                        fontSize: '13px',
+                                                                        cursor: 'pointer',
+                                                                        transition: 'all 0.2s'
+                                                                    }}
+                                                                >
+                                                                    💭 Reaction
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Color Filter */}
+                                                        <div>
+                                                            <div style={{ 
+                                                                fontSize: '13px', 
+                                                                fontWeight: 600, 
+                                                                color: '#374151',
+                                                                marginBottom: '8px'
+                                                            }}>
+                                                                Colors {sceneColorFilter.length > 0 && `(${sceneColorFilter.length})`}
+                                                            </div>
+                                                            <div style={{ 
+                                                                display: 'flex', 
+                                                                gap: '6px',
+                                                                flexWrap: 'wrap',
+                                                                maxWidth: '300px'
+                                                            }}>
+                                                                {COLORS.map(color => (
+                                                                    <button
+                                                                        key={color.className}
+                                                                        onClick={() => toggleColorFilter(color.className)}
+                                                                        className={color.className}
+                                                                        style={{
+                                                                            width: '32px',
+                                                                            height: '32px',
+                                                                            border: sceneColorFilter.includes(color.className) ? '3px solid #4f46e5' : '2px solid',
+                                                                            borderRadius: '6px',
+                                                                            cursor: 'pointer',
+                                                                            opacity: sceneColorFilter.length === 0 || sceneColorFilter.includes(color.className) ? 1 : 0.3,
+                                                                            transition: 'all 0.2s'
+                                                                        }}
+                                                                        title={color.name}
+                                                                    />
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
 
                                         {scenesViewMode === 'card' ? (
