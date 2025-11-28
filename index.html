@@ -1218,7 +1218,7 @@
                         
                         const newProject = {
                             id: Date.now().toString(),
-                            name: data.name || 'Imported Project',
+                            name: file.name.replace('.novelatta', '') || 'Imported Project',
                             scenes: data.scenes || [],
                             chapters: data.chapters || [],
                             characters: data.characters || [],
