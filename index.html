@@ -1085,6 +1085,18 @@
                 setShowSaveAs(true);
             };
 
+            // Generate timestamp in format: 2024-11-28 14-30-15
+            const getTimestamp = () => {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                return `${year}-${month}-${day} ${hours}-${minutes}-${seconds}`;
+            };
+
             // Save counter functions
             const getSaveCounter = (projectName) => {
                 const counters = JSON.parse(localStorage.getItem('novelatta_saveCounters') || '{}');
@@ -1111,8 +1123,10 @@
                     return;
                 }
                 
-                // Strip any trailing (number) from the filename
-                let cleanFileName = saveFileName.trim().replace(/\s*\(\d+\)$/, '');
+                // Strip any trailing timestamp and (number) from the filename
+                let cleanFileName = saveFileName.trim();
+                cleanFileName = cleanFileName.replace(/\s+\d{4}-\d{2}-\d{2}\s+\d{2}-\d{2}-\d{2}$/, '');
+                cleanFileName = cleanFileName.replace(/\s*\(\d+\)$/, '');
                 
                 // Check if this is a new project name
                 const isNewName = !currentProject.name || currentProject.name !== cleanFileName;
@@ -1123,11 +1137,12 @@
                 const counter = incrementSaveCounter(cleanFileName);
                 const baseFilename = cleanFileName.endsWith('.novelatta') ? 
                     cleanFileName.replace('.novelatta', '') : cleanFileName;
+                const timestamp = getTimestamp();
                 const filename = counter === 1 ? 
-                    `${baseFilename}.novelatta` : 
-                    `${baseFilename} (${counter - 1}).novelatta`;
+                    `${baseFilename} ${timestamp}.novelatta` : 
+                    `${baseFilename} (${counter - 1}) ${timestamp}.novelatta`;
                 
-                // Set display name to match the actual saved filename
+                // Set display name to match the actual saved filename (without timestamp for cleaner display)
                 const displayName = counter === 1 ? 
                     baseFilename : 
                     `${baseFilename} (${counter - 1})`;
@@ -1182,11 +1197,12 @@
                     const counter = incrementSaveCounter(currentProject.name);
                     const baseFilename = currentProject.name.endsWith('.novelatta') ? 
                         currentProject.name.replace('.novelatta', '') : currentProject.name;
+                    const timestamp = getTimestamp();
                     const filename = counter === 1 ? 
-                        `${baseFilename}.novelatta` : 
-                        `${baseFilename} (${counter - 1}).novelatta`;
+                        `${baseFilename} ${timestamp}.novelatta` : 
+                        `${baseFilename} (${counter - 1}) ${timestamp}.novelatta`;
                     
-                    // Set display name to match the actual saved filename
+                    // Set display name to match the actual saved filename (without timestamp for cleaner display)
                     const displayName = counter === 1 ? 
                         baseFilename : 
                         `${baseFilename} (${counter - 1})`;
@@ -1262,7 +1278,10 @@
 
             const saveAsNewFile = () => {
                 if (!currentProject) return;
-                const baseName = (currentProject.name || '').replace(/\s*\(\d+\)$/, '');
+                let baseName = currentProject.name || '';
+                // Strip timestamp and numbers for clean Save As name
+                baseName = baseName.replace(/\s+\d{4}-\d{2}-\d{2}\s+\d{2}-\d{2}-\d{2}$/, '');
+                baseName = baseName.replace(/\s*\(\d+\)$/, '');
                 setSaveFileName(baseName);
                 setShowSaveAs(true);
             };
@@ -1285,15 +1304,19 @@
                     try {
                         const data = JSON.parse(event.target.result);
                         
-                        // Get full filename for display
-                        const fullFileName = file.name.replace('.novelatta', '') || 'Imported Project';
-                        // Strip trailing (number) for clean base name used in counter logic
-                        const baseName = fullFileName.replace(/\s*\(\d+\)$/, '');
+                        // Get full filename and strip .novelatta
+                        let fullFileName = file.name.replace('.novelatta', '') || 'Imported Project';
+                        // Strip trailing timestamp (YYYY-MM-DD HH-MM-SS format)
+                        const withoutTimestamp = fullFileName.replace(/\s+\d{4}-\d{2}-\d{2}\s+\d{2}-\d{2}-\d{2}$/, '');
+                        // For display, keep the version number
+                        const displayName = withoutTimestamp;
+                        // For base name (used in counter), strip the number too
+                        const baseName = withoutTimestamp.replace(/\s*\(\d+\)$/, '');
                         
                         const newProject = {
                             id: Date.now().toString(),
                             name: baseName,
-                            displayName: fullFileName,
+                            displayName: displayName,
                             scenes: data.scenes || [],
                             chapters: data.chapters || [],
                             characters: data.characters || [],
