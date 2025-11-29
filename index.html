@@ -725,11 +725,23 @@
             border-radius: 8px;
             margin-bottom: 12px;
             display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-left: 4px solid #6366f1;
+            transition: background-color 0.2s;
+        }
+
+        .chapter-header-row {
+            display: flex;
             align-items: center;
             justify-content: space-between;
-            border-left: 4px solid #6366f1;
-            cursor: pointer;
-            transition: background-color 0.2s;
+        }
+
+        .chapter-controls-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 4px;
+            align-items: center;
         }
 
         .chapter-header:hover {
@@ -743,6 +755,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            cursor: pointer;
         }
 
         .chapter-arrow-btn {
@@ -3997,85 +4010,84 @@
                                                                     borderColor: dragOverChapter === chapter.id ? '#3b82f6' : '#6366f1'
                                                                 }}
                                                             >
-                                                                <div 
-                                                                    className="chapter-title"
-                                                                    onClick={() => toggleChapterCollapse(chapter.id)}
-                                                                    style={{ cursor: 'pointer', flex: 1 }}
-                                                                >
-                                                                    <span style={{
-                                                                        fontSize: '12px',
-                                                                        color: '#6b7280',
-                                                                        transition: 'transform 0.2s ease',
-                                                                        display: 'inline-block',
-                                                                        transform: chapter.collapsed ? 'rotate(-90deg)' : 'rotate(0deg)'
-                                                                    }}>
-                                                                        ▼
-                                                                    </span>
-                                                                    {editingChapter === chapter.id ? (
-                                                                        <span>
-                                                                            <span style={{ fontWeight: 600, marginRight: '4px' }}>
-                                                                                Ch {getGlobalChapterNumber(chapter.id)}:
-                                                                            </span>
-                                                                            <input
-                                                                                type="text"
-                                                                                value={chapter.name}
-                                                                                onChange={(e) => updateChapter(chapter.id, { name: e.target.value })}
-                                                                                onBlur={() => setEditingChapter(null)}
-                                                                                onKeyDown={(e) => {
-                                                                                    if (e.key === 'Enter') setEditingChapter(null);
-                                                                                    if (e.key === 'Escape') setEditingChapter(null);
-                                                                                }}
-                                                                                onClick={(e) => e.stopPropagation()}
-                                                                                autoFocus
-                                                                                style={{
-                                                                                    border: 'none',
-                                                                                    background: 'white',
-                                                                                    padding: '2px 6px',
-                                                                                    borderRadius: '3px',
-                                                                                    fontSize: '14px',
-                                                                                    fontWeight: 600,
-                                                                                    width: '200px'
-                                                                                }}
-                                                                            />
+                                                                <div className="chapter-header-row">
+                                                                    <div 
+                                                                        className="chapter-title"
+                                                                        onClick={() => toggleChapterCollapse(chapter.id)}
+                                                                    >
+                                                                        <span style={{
+                                                                            fontSize: '12px',
+                                                                            color: '#6b7280',
+                                                                            transition: 'transform 0.2s ease',
+                                                                            display: 'inline-block',
+                                                                            transform: chapter.collapsed ? 'rotate(-90deg)' : 'rotate(0deg)'
+                                                                        }}>
+                                                                            ▼
                                                                         </span>
-                                                                    ) : (
-                                                                        <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                        {editingChapter === chapter.id ? (
                                                                             <span>
-                                                                                Ch {getGlobalChapterNumber(chapter.id)}: {chapter.name}
+                                                                                <span style={{ fontWeight: 600, marginRight: '4px' }}>
+                                                                                    Ch {getGlobalChapterNumber(chapter.id)}:
+                                                                                </span>
+                                                                                <input
+                                                                                    type="text"
+                                                                                    value={chapter.name}
+                                                                                    onChange={(e) => updateChapter(chapter.id, { name: e.target.value })}
+                                                                                    onBlur={() => setEditingChapter(null)}
+                                                                                    onKeyDown={(e) => {
+                                                                                        if (e.key === 'Enter') setEditingChapter(null);
+                                                                                        if (e.key === 'Escape') setEditingChapter(null);
+                                                                                    }}
+                                                                                    onClick={(e) => e.stopPropagation()}
+                                                                                    autoFocus
+                                                                                    style={{
+                                                                                        border: 'none',
+                                                                                        background: 'white',
+                                                                                        padding: '2px 6px',
+                                                                                        borderRadius: '3px',
+                                                                                        fontSize: '14px',
+                                                                                        fontWeight: 600,
+                                                                                        width: '200px'
+                                                                                    }}
+                                                                                />
                                                                             </span>
-                                                                            <button
-                                                                                onClick={(e) => {
-                                                                                    e.stopPropagation();
-                                                                                    setEditingChapter(chapter.id);
-                                                                                }}
-                                                                                className="icon-btn"
-                                                                                title="Rename chapter"
-                                                                                style={{
-                                                                                    fontSize: '14px',
-                                                                                    padding: '2px 6px',
-                                                                                    color: '#6b7280',
-                                                                                    background: 'none',
-                                                                                    border: 'none',
-                                                                                    cursor: 'pointer',
-                                                                                    transition: 'color 0.2s'
-                                                                                }}
-                                                                                onMouseEnter={(e) => e.target.style.color = '#4f46e5'}
-                                                                                onMouseLeave={(e) => e.target.style.color = '#6b7280'}
-                                                                            >
-                                                                                ✏️
-                                                                            </button>
-                                                                        </span>
-                                                                    )}
+                                                                        ) : (
+                                                                            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                                <span>
+                                                                                    Ch {getGlobalChapterNumber(chapter.id)}: {chapter.name}
+                                                                                </span>
+                                                                                <button
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        setEditingChapter(chapter.id);
+                                                                                    }}
+                                                                                    className="icon-btn"
+                                                                                    title="Rename chapter"
+                                                                                    style={{
+                                                                                        fontSize: '14px',
+                                                                                        padding: '2px 6px',
+                                                                                        color: '#6b7280',
+                                                                                        background: 'none',
+                                                                                        border: 'none',
+                                                                                        cursor: 'pointer',
+                                                                                        transition: 'color 0.2s'
+                                                                                    }}
+                                                                                    onMouseEnter={(e) => e.target.style.color = '#4f46e5'}
+                                                                                    onMouseLeave={(e) => e.target.style.color = '#6b7280'}
+                                                                                >
+                                                                                    ✏️
+                                                                                </button>
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                                <div className="chapter-controls-row">
                                                                     {chapter.collapsed && (
                                                                         <span style={{ fontWeight: 400, color: '#6b7280', fontSize: '13px' }}>
                                                                             ({getScenesByChapter(chapter.id).length} scenes)
                                                                         </span>
                                                                     )}
-                                                                </div>
-                                                                <div 
-                                                                    style={{ display: 'flex', gap: '4px', alignItems: 'center' }}
-                                                                    onClick={(e) => e.stopPropagation()}
-                                                                >
+                                                                    <div style={{ display: 'flex', gap: '4px', alignItems: 'center', marginLeft: 'auto' }}>
                                                                     <button
                                                                         onClick={() => moveChapterUp(chapter.id)}
                                                                         disabled={isFirstChapter(chapter.id, act)}
@@ -4111,6 +4123,7 @@
                                                                     >
                                                                         🗑️
                                                                     </button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             
@@ -4120,11 +4133,13 @@
                                                                         <SceneCard
                                                                             key={scene.id}
                                                                             scene={scene}
-                                                                            isEditing={editingScene === scene.id}
+                                                                            isExpanded={expandedCard === scene.id}
                                                                             isDragging={draggedScene?.id === scene.id}
-                                                                            onEdit={() => setEditingScene(scene.id)}
-                                                                            onDone={() => setEditingScene(null)}
-                                                                            onUpdate={(updates) => updateScene(scene.id, updates)}
+                                                                            onToggleExpand={() => setExpandedCard(expandedCard === scene.id ? null : scene.id)}
+                                                                            onEdit={() => {
+                                                                                setEditingScene(scene.id);
+                                                                                setShowSceneModal(true);
+                                                                            }}
                                                                             onDelete={() => deleteScene(scene.id)}
                                                                             onDragStart={handleSceneDragStart}
                                                                             onDragOver={handleSceneDragOver}
@@ -4153,8 +4168,10 @@
                                                                     borderStyle: 'dashed'
                                                                 }}
                                                             >
-                                                                <div className="chapter-title">
-                                                                    Unchaptered Scenes
+                                                                <div className="chapter-header-row">
+                                                                    <div className="chapter-title">
+                                                                        Unchaptered Scenes
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
@@ -4162,11 +4179,13 @@
                                                                     <SceneCard
                                                                         key={scene.id}
                                                                         scene={scene}
-                                                                        isEditing={editingScene === scene.id}
+                                                                        isExpanded={expandedCard === scene.id}
                                                                         isDragging={draggedScene?.id === scene.id}
-                                                                        onEdit={() => setEditingScene(scene.id)}
-                                                                        onDone={() => setEditingScene(null)}
-                                                                        onUpdate={(updates) => updateScene(scene.id, updates)}
+                                                                        onToggleExpand={() => setExpandedCard(expandedCard === scene.id ? null : scene.id)}
+                                                                        onEdit={() => {
+                                                                            setEditingScene(scene.id);
+                                                                            setShowSceneModal(true);
+                                                                        }}
                                                                         onDelete={() => deleteScene(scene.id)}
                                                                         onDragStart={handleSceneDragStart}
                                                                         onDragOver={handleSceneDragOver}
@@ -4642,288 +4661,132 @@
         }
 
         // Scene components
-        function SceneCard({ scene, isEditing, isDragging, onEdit, onDone, onUpdate, onDelete, onDragStart, onDragOver, onDrop }) {
-            
-            const handleTypeChange = (newType) => {
-                if (scene.type === newType) return; // Already this type
-                
-                // Check if other type has data
-                const hasActionData = scene.objective || scene.obstacle || scene.outcome;
-                const hasReactionData = scene.emotion || scene.deliberation || scene.decision;
-                
-                const willLoseData = (newType === 'action' && hasReactionData) || 
-                                    (newType === 'reaction' && hasActionData);
-                
-                if (willLoseData) {
-                    const confirmMsg = newType === 'action' 
-                        ? 'Switch to Action scene? This will clear Reaction fields (Emotion, Deliberation, Decision).'
-                        : 'Switch to Reaction scene? This will clear Action fields (Objective, Obstacle, Outcome).';
-                    
-                    if (!confirm(confirmMsg)) {
-                        return; // User cancelled
-                    }
-                }
-                
-                // Clear the other type's fields
-                const updates = { type: newType };
-                if (newType === 'action') {
-                    updates.emotion = '';
-                    updates.deliberation = '';
-                    updates.decision = '';
-                } else {
-                    updates.objective = '';
-                    updates.obstacle = '';
-                    updates.outcome = '';
-                }
-                
-                onUpdate(updates);
-            };
-            
-            if (!isEditing) {
-                return (
-                    <div 
-                        className={`scene-card ${scene.color} ${isDragging ? 'dragging' : ''}`} 
-                        onClick={onEdit}
-                        draggable
-                        onDragStart={(e) => onDragStart(e, scene)}
-                        onDragOver={onDragOver}
-                        onDrop={(e) => onDrop(e, scene, scene.act, scene.chapterId)}
-                    >
-                        <div className="scene-header">
-                            <div className="scene-title-section">
-                                <div className="scene-title">
-                                    {scene.title || 'Untitled Scene'}
-                                </div>
-                                <div className="scene-type">
-                                    {scene.type === 'action' ? '⚡ Action' : '💭 Reaction'}
-                                </div>
+        function SceneCard({ scene, isExpanded, isDragging, onToggleExpand, onEdit, onDelete, onDragStart, onDragOver, onDrop }) {
+            return (
+                <div 
+                    className={`scene-card ${scene.color} ${isDragging ? 'dragging' : ''}`}
+                    draggable
+                    onDragStart={(e) => onDragStart(e, scene)}
+                    onDragOver={onDragOver}
+                    onDrop={(e) => onDrop(e, scene, scene.act, scene.chapterId)}
+                >
+                    <div className="scene-header">
+                        <div className="scene-title-section">
+                            <div className="scene-title">
+                                {scene.title || 'Untitled Scene'}
+                            </div>
+                            <div className="scene-type">
+                                {scene.type === 'action' ? '⚡ Action' : '💭 Reaction'}
                             </div>
                         </div>
-                        
-                        {scene.type === 'action' ? (
-                            <div className="scene-details">
-                                {scene.objective && (
-                                    <div className="scene-detail-row">
-                                        <span className="scene-detail-label">Objective:</span>
-                                        {scene.objective.substring(0, 40)}{scene.objective.length > 40 ? '...' : ''}
-                                    </div>
-                                )}
-                                {scene.obstacle && (
-                                    <div className="scene-detail-row">
-                                        <span className="scene-detail-label">Obstacle:</span>
-                                        {scene.obstacle.substring(0, 40)}{scene.obstacle.length > 40 ? '...' : ''}
-                                    </div>
-                                )}
-                                {scene.outcome && (
-                                    <div className="scene-detail-row">
-                                        <span className="scene-detail-label">Outcome:</span>
-                                        {scene.outcome.substring(0, 40)}{scene.outcome.length > 40 ? '...' : ''}
-                                    </div>
-                                )}
-                            </div>
-                        ) : (
-                            <div className="scene-details">
-                                {scene.emotion && (
-                                    <div className="scene-detail-row">
-                                        <span className="scene-detail-label">Emotion:</span>
-                                        {scene.emotion.substring(0, 40)}{scene.emotion.length > 40 ? '...' : ''}
-                                    </div>
-                                )}
-                                {scene.deliberation && (
-                                    <div className="scene-detail-row">
-                                        <span className="scene-detail-label">Deliberation:</span>
-                                        {scene.deliberation.substring(0, 40)}{scene.deliberation.length > 40 ? '...' : ''}
-                                    </div>
-                                )}
-                                {scene.decision && (
-                                    <div className="scene-detail-row">
-                                        <span className="scene-detail-label">Decision:</span>
-                                        {scene.decision.substring(0, 40)}{scene.decision.length > 40 ? '...' : ''}
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                );
-            }
-
-            // Editing mode
-            return (
-                <div className={`scene-card editing ${scene.color}`} onClick={(e) => e.stopPropagation()}>
-                    <div className="scene-header">
-                        <input
-                            type="text"
-                            value={scene.title}
-                            onChange={(e) => onUpdate({ title: e.target.value })}
-                            placeholder="Scene title"
-                            style={{ 
-                                width: '100%', 
-                                border: 'none', 
-                                background: 'transparent',
-                                fontSize: '15px',
-                                fontWeight: 600,
-                                padding: '4px',
-                                marginBottom: '8px'
-                            }}
-                        />
                         <div className="scene-actions">
-                            <button className="icon-btn delete" onClick={onDelete}>🗑️</button>
-                            <button 
-                                onClick={onDone}
-                                style={{
-                                    padding: '4px 12px',
-                                    border: 'none',
-                                    borderRadius: '4px',
-                                    fontSize: '12px',
-                                    cursor: 'pointer',
-                                    background: '#4f46e5',
-                                    color: 'white',
-                                    fontWeight: 500
-                                }}
-                            >
-                                Done
+                            <button className="icon-btn" onClick={onEdit} title="Edit">
+                                ✏️
+                            </button>
+                            <button className="icon-btn delete" onClick={onDelete} title="Delete">
+                                🗑️
                             </button>
                         </div>
                     </div>
-
-                    <div style={{ marginBottom: '12px', display: 'flex', gap: '8px' }}>
-                        <button
-                            onClick={() => handleTypeChange('action')}
-                            style={{
-                                flex: 1,
-                                padding: '8px',
-                                border: scene.type === 'action' ? '2px solid #4f46e5' : '1px solid #d1d5db',
-                                borderRadius: '6px',
-                                background: scene.type === 'action' ? '#eff6ff' : 'white',
-                                cursor: 'pointer',
-                                fontWeight: scene.type === 'action' ? 600 : 400,
-                                color: scene.type === 'action' ? '#1e40af' : '#374151'
-                            }}
-                        >
-                            ⚡ Action
-                        </button>
-                        <button
-                            onClick={() => handleTypeChange('reaction')}
-                            style={{
-                                flex: 1,
-                                padding: '8px',
-                                border: scene.type === 'reaction' ? '2px solid #4f46e5' : '1px solid #d1d5db',
-                                borderRadius: '6px',
-                                background: scene.type === 'reaction' ? '#eff6ff' : 'white',
-                                cursor: 'pointer',
-                                fontWeight: scene.type === 'reaction' ? 600 : 400,
-                                color: scene.type === 'reaction' ? '#1e40af' : '#374151'
-                            }}
-                        >
-                            💭 Reaction
-                        </button>
-                    </div>
-
-                    {scene.type === 'action' ? (
-                        <>
-                            <textarea
-                                ref={(el) => autoResizeTextarea(el)}
-                                value={scene.objective}
-                                onChange={(e) => {
-                                    onUpdate({ objective: e.target.value });
-                                    autoResizeTextarea(e.target);
-                                }}
-                                placeholder="Objective: What does the character want?"
-                                style={{ width: '100%', minHeight: '50px', marginBottom: '6px', padding: '6px', fontSize: '13px', resize: 'none', overflow: 'hidden' }}
-                            />
-                            <textarea
-                                ref={(el) => autoResizeTextarea(el)}
-                                value={scene.obstacle}
-                                onChange={(e) => {
-                                    onUpdate({ obstacle: e.target.value });
-                                    autoResizeTextarea(e.target);
-                                }}
-                                placeholder="Obstacle: What stands in their way?"
-                                style={{ width: '100%', minHeight: '50px', marginBottom: '6px', padding: '6px', fontSize: '13px', resize: 'none', overflow: 'hidden' }}
-                            />
-                            <textarea
-                                ref={(el) => autoResizeTextarea(el)}
-                                value={scene.outcome}
-                                onChange={(e) => {
-                                    onUpdate({ outcome: e.target.value });
-                                    autoResizeTextarea(e.target);
-                                }}
-                                placeholder="Outcome: What happens?"
-                                style={{ width: '100%', minHeight: '50px', marginBottom: '6px', padding: '6px', fontSize: '13px', resize: 'none', overflow: 'hidden' }}
-                            />
-                        </>
-                    ) : (
-                        <>
-                            <textarea
-                                ref={(el) => autoResizeTextarea(el)}
-                                value={scene.emotion}
-                                onChange={(e) => {
-                                    onUpdate({ emotion: e.target.value });
-                                    autoResizeTextarea(e.target);
-                                }}
-                                placeholder="Emotion: How do they feel?"
-                                style={{ width: '100%', minHeight: '50px', marginBottom: '6px', padding: '6px', fontSize: '13px', resize: 'none', overflow: 'hidden' }}
-                            />
-                            <textarea
-                                ref={(el) => autoResizeTextarea(el)}
-                                value={scene.deliberation}
-                                onChange={(e) => {
-                                    onUpdate({ deliberation: e.target.value });
-                                    autoResizeTextarea(e.target);
-                                }}
-                                placeholder="Deliberation: What do they consider?"
-                                style={{ width: '100%', minHeight: '50px', marginBottom: '6px', padding: '6px', fontSize: '13px', resize: 'none', overflow: 'hidden' }}
-                            />
-                            <textarea
-                                ref={(el) => autoResizeTextarea(el)}
-                                value={scene.decision}
-                                onChange={(e) => {
-                                    onUpdate({ decision: e.target.value });
-                                    autoResizeTextarea(e.target);
-                                }}
-                                placeholder="Decision: What do they decide?"
-                                style={{ width: '100%', minHeight: '50px', marginBottom: '6px', padding: '6px', fontSize: '13px', resize: 'none', overflow: 'hidden' }}
-                            />
-                        </>
+                    
+                    {!isExpanded && (scene.objective || scene.obstacle || scene.outcome || scene.emotion || scene.deliberation || scene.decision) && (
+                        <div className="scene-details">
+                            {scene.type === 'action' && scene.objective && (
+                                <div className="scene-detail-row">
+                                    <span className="scene-detail-label">Objective:</span>
+                                    {scene.objective.substring(0, 40)}{scene.objective.length > 40 ? '...' : ''}
+                                </div>
+                            )}
+                            {scene.type === 'reaction' && scene.emotion && (
+                                <div className="scene-detail-row">
+                                    <span className="scene-detail-label">Emotion:</span>
+                                    {scene.emotion.substring(0, 40)}{scene.emotion.length > 40 ? '...' : ''}
+                                </div>
+                            )}
+                        </div>
                     )}
 
-                    <textarea
-                        ref={(el) => autoResizeTextarea(el)}
-                        value={scene.notes}
-                        onChange={(e) => {
-                            onUpdate({ notes: e.target.value });
-                            autoResizeTextarea(e.target);
-                        }}
-                        placeholder="Notes..."
-                        style={{ width: '100%', minHeight: '40px', marginBottom: '12px', padding: '6px', fontSize: '13px', resize: 'none', overflow: 'hidden' }}
-                    />
+                    {!isExpanded && (
+                        <button 
+                            className="btn btn-gray btn-small" 
+                            onClick={onToggleExpand}
+                            style={{ marginTop: '12px', width: '100%' }}
+                        >
+                            Show Details
+                        </button>
+                    )}
 
-                    <div style={{ 
-                        display: 'flex', 
-                        gap: '6px', 
-                        flexWrap: 'wrap',
-                        paddingTop: '8px',
-                        borderTop: '1px solid #e5e7eb'
-                    }}>
-                        {COLORS.map(color => (
-                            <button
-                                key={color.className}
-                                onClick={() => onUpdate({ color: color.className })}
-                                className={color.className}
-                                style={{
-                                    width: '32px',
-                                    height: '32px',
-                                    border: scene.color === color.className ? '3px solid #4f46e5' : '2px solid',
-                                    borderRadius: '6px',
-                                    cursor: 'pointer'
-                                }}
-                                title={color.name}
-                            />
-                        ))}
-                    </div>
+                    {isExpanded && (
+                        <>
+                            {scene.type === 'action' ? (
+                                <div className="card-details">
+                                    {scene.objective && (
+                                        <div className="detail-section">
+                                            <div className="detail-label">Objective</div>
+                                            <div className="detail-content">{scene.objective}</div>
+                                        </div>
+                                    )}
+                                    {scene.obstacle && (
+                                        <div className="detail-section">
+                                            <div className="detail-label">Obstacle</div>
+                                            <div className="detail-content">{scene.obstacle}</div>
+                                        </div>
+                                    )}
+                                    {scene.outcome && (
+                                        <div className="detail-section">
+                                            <div className="detail-label">Outcome</div>
+                                            <div className="detail-content">{scene.outcome}</div>
+                                        </div>
+                                    )}
+                                    {scene.notes && (
+                                        <div className="detail-section">
+                                            <div className="detail-label">Notes</div>
+                                            <div className="detail-content">{scene.notes}</div>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="card-details">
+                                    {scene.emotion && (
+                                        <div className="detail-section">
+                                            <div className="detail-label">Emotion</div>
+                                            <div className="detail-content">{scene.emotion}</div>
+                                        </div>
+                                    )}
+                                    {scene.deliberation && (
+                                        <div className="detail-section">
+                                            <div className="detail-label">Deliberation</div>
+                                            <div className="detail-content">{scene.deliberation}</div>
+                                        </div>
+                                    )}
+                                    {scene.decision && (
+                                        <div className="detail-section">
+                                            <div className="detail-label">Decision</div>
+                                            <div className="detail-content">{scene.decision}</div>
+                                        </div>
+                                    )}
+                                    {scene.notes && (
+                                        <div className="detail-section">
+                                            <div className="detail-label">Notes</div>
+                                            <div className="detail-content">{scene.notes}</div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            <button 
+                                className="btn btn-gray btn-small" 
+                                onClick={onToggleExpand}
+                                style={{ marginTop: '12px', width: '100%' }}
+                            >
+                                Hide Details
+                            </button>
+                        </>
+                    )}
                 </div>
             );
         }
+
 
         // Scenes List component
         function ScenesList({ scenes, chapters, expandedRow, onToggleExpand, onEdit, onDelete, getChapterNumber }) {
