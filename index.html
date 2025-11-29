@@ -940,7 +940,7 @@
             const [newProjectName, setNewProjectName] = useState('');
             const [saveFileName, setSaveFileName] = useState('');
             const [unsavedChanges, setUnsavedChanges] = useState(false);
-            const [saveSuccessMessage, setSaveSuccessMessage] = useState(false);
+            const [saveSuccessMessage, setSaveSuccessMessage] = useState('');
             
             // Drag state
             const [draggedCharacter, setDraggedCharacter] = useState(null);
@@ -1035,13 +1035,6 @@
                     scenesSearchQuery !== ''
                 );
             };
-
-            // Track unsaved changes
-            useEffect(() => {
-                if (currentProject && (scenes.length > 0 || characters.length > 0 || locations.length > 0 || notes.length > 0)) {
-                    setUnsavedChanges(true);
-                }
-            }, [scenes, characters, locations, notes]);
 
             // Close export menu when clicking outside
             useEffect(() => {
@@ -1203,8 +1196,8 @@
                 URL.revokeObjectURL(url);
                 
                 setUnsavedChanges(false);
-                setSaveSuccessMessage(true);
-                setTimeout(() => setSaveSuccessMessage(false), 5000);
+                setSaveSuccessMessage('Saved');
+                setTimeout(() => setSaveSuccessMessage(''), 5000);
                 
                 setShowSaveAs(false);
             };
@@ -1253,8 +1246,8 @@
                     URL.revokeObjectURL(url);
                     
                     setUnsavedChanges(false);
-                    setSaveSuccessMessage(true);
-                    setTimeout(() => setSaveSuccessMessage(false), 5000);
+                    setSaveSuccessMessage('Saved');
+                    setTimeout(() => setSaveSuccessMessage(''), 5000);
                 } else {
                     // First time saving - show Save As dialog
                     setSaveFileName('');
@@ -1302,8 +1295,8 @@
                     URL.revokeObjectURL(url);
                     
                     setUnsavedChanges(false);
-                    setSaveSuccessMessage(true);
-                    setTimeout(() => setSaveSuccessMessage(false), 5000);
+                    setSaveSuccessMessage('Saved');
+                    setTimeout(() => setSaveSuccessMessage(''), 5000);
                 }
             };
 
@@ -1337,11 +1330,11 @@
                         
                         // Get full filename and strip .novelatta
                         let fullFileName = file.name.replace('.novelatta', '') || 'Imported Project';
-                        // Strip trailing timestamp (YYYY-MM-DD HH-MM-SS format)
+                        // For display, show the full filename including timestamp
+                        const displayName = fullFileName;
+                        // Strip trailing timestamp (YYYY-MM-DD HH-MM-SS format) for base name
                         const withoutTimestamp = fullFileName.replace(/\s+\d{4}-\d{2}-\d{2}\s+\d{2}-\d{2}-\d{2}$/, '');
-                        // For display, keep the version number
-                        const displayName = withoutTimestamp;
-                        // For base name (used in counter), strip the number too
+                        // For base name (used in counter), strip the version number too
                         const baseName = withoutTimestamp.replace(/\s*\(\d+\)$/, '');
                         
                         const newProject = {
@@ -1366,7 +1359,9 @@
                         setEditingCard(null);
                         setUnsavedChanges(false);
                         
-                        alert(`Successfully opened "${newProject.name}"!`);
+                        // Show success message
+                        setSaveSuccessMessage('Loaded');
+                        setTimeout(() => setSaveSuccessMessage(''), 3000);
                     } catch (err) {
                         console.error('Import error:', err);
                         alert('Failed to open project. Please make sure this is a valid .novelatta file.');
@@ -2003,6 +1998,7 @@
                     createdAt: new Date().toISOString()
                 };
                 setCharacters([...characters, newCharacter]);
+                setUnsavedChanges(true);
                 setEditingCard(newCharacter.id);
                 setShowModal(true);
             };
@@ -2011,11 +2007,13 @@
                 setCharacters(characters.map(c => 
                     c.id === id ? { ...c, ...updates } : c
                 ));
+                setUnsavedChanges(true);
             };
 
             const deleteCharacter = (id) => {
                 if (confirm('Are you sure you want to delete this character?')) {
                     setCharacters(characters.filter(c => c.id !== id));
+                    setUnsavedChanges(true);
                     if (expandedCard === id) setExpandedCard(null);
                     if (editingCard === id) {
                         setEditingCard(null);
@@ -2038,6 +2036,7 @@
                     createdAt: new Date().toISOString()
                 };
                 setLocations([...locations, newLocation]);
+                setUnsavedChanges(true);
                 setEditingCard(newLocation.id);
                 setShowModal(true);
             };
@@ -2046,11 +2045,13 @@
                 setLocations(locations.map(l => 
                     l.id === id ? { ...l, ...updates } : l
                 ));
+                setUnsavedChanges(true);
             };
 
             const deleteLocation = (id) => {
                 if (confirm('Are you sure you want to delete this location?')) {
                     setLocations(locations.filter(l => l.id !== id));
+                    setUnsavedChanges(true);
                     if (expandedCard === id) setExpandedCard(null);
                     if (editingCard === id) {
                         setEditingCard(null);
@@ -2085,6 +2086,7 @@
                 newCharacters.splice(targetIndex, 0, removed);
 
                 setCharacters(newCharacters);
+                setUnsavedChanges(true);
                 setDraggedCharacter(null);
             };
 
@@ -2114,6 +2116,7 @@
                 newLocations.splice(targetIndex, 0, removed);
 
                 setLocations(newLocations);
+                setUnsavedChanges(true);
                 setDraggedLocation(null);
             };
 
@@ -2129,6 +2132,7 @@
                     updatedAt: new Date().toISOString()
                 };
                 setNotes([...notes, newNote]);
+                setUnsavedChanges(true);
                 setEditingCard(newNote.id);
                 setShowModal(true);
             };
@@ -2137,11 +2141,13 @@
                 setNotes(notes.map(n => 
                     n.id === id ? { ...n, ...updates, updatedAt: new Date().toISOString() } : n
                 ));
+                setUnsavedChanges(true);
             };
 
             const deleteNote = (id) => {
                 if (confirm('Delete this note? This cannot be undone.')) {
                     setNotes(notes.filter(n => n.id !== id));
+                    setUnsavedChanges(true);
                 }
             };
 
@@ -2163,16 +2169,19 @@
                     notes: ''
                 };
                 setScenes([...scenes, newScene]);
+                setUnsavedChanges(true);
                 setEditingScene(newScene.id);
             };
 
             const updateScene = (id, updates) => {
                 setScenes(scenes.map(s => s.id === id ? { ...s, ...updates } : s));
+                setUnsavedChanges(true);
             };
 
             const deleteScene = (id) => {
                 if (confirm('Delete this scene? This cannot be undone.')) {
                     setScenes(scenes.filter(s => s.id !== id));
+                    setUnsavedChanges(true);
                     if (editingScene === id) setEditingScene(null);
                 }
             };
@@ -2186,6 +2195,7 @@
                     collapsed: false
                 };
                 setChapters([...chapters, newChapter]);
+                setUnsavedChanges(true);
             };
 
             const deleteChapter = (chapterId) => {
@@ -2194,12 +2204,14 @@
                 setScenes(scenes.map(s => 
                     s.chapterId === chapterId ? { ...s, chapterId: null } : s
                 ));
+                setUnsavedChanges(true);
             };
 
             const updateChapter = (chapterId, updates) => {
                 setChapters(chapters.map(c => 
                     c.id === chapterId ? { ...c, ...updates } : c
                 ));
+                setUnsavedChanges(true);
             };
 
             const toggleChapterCollapse = (chapterId) => {
@@ -2227,6 +2239,7 @@
                 });
                 
                 setChapters(updatedChapters);
+                setUnsavedChanges(true);
             };
 
             const moveChapterDown = (chapterId) => {
@@ -2248,6 +2261,7 @@
                 });
                 
                 setChapters(updatedChapters);
+                setUnsavedChanges(true);
             };
 
             const isFirstChapter = (chapterId, act) => {
@@ -2289,8 +2303,31 @@
                 if (targetScene) {
                     targetIndex = scenes.findIndex(s => s.id === targetScene.id);
                 } else {
-                    targetIndex = scenes.filter(s => s.act === targetAct && s.chapterId === targetChapterId).length + 
-                                 scenes.filter((s, i) => i < scenes.length && (s.act < targetAct || (s.act === targetAct && s.chapterId !== targetChapterId))).length;
+                    // Calculate position for empty drop zones using proper chapter ordering
+                    const targetChapter = targetChapterId ? chapters.find(c => c.id === targetChapterId) : null;
+                    
+                    targetIndex = scenes.filter(s => {
+                        // Include scenes from earlier acts
+                        if (s.act < targetAct) return true;
+                        if (s.act > targetAct) return false;
+                        
+                        // Same act - check chapter positioning
+                        if (targetChapterId) {
+                            // Dropping into a chapter - include scenes from earlier chapters or same chapter
+                            if (!s.chapterId) {
+                                // Unchaptered scenes come after chapters
+                                return false;
+                            }
+                            const sceneChapter = chapters.find(c => c.id === s.chapterId);
+                            if (sceneChapter && targetChapter) {
+                                return sceneChapter.order <= targetChapter.order;
+                            }
+                            return s.chapterId === targetChapterId;
+                        } else {
+                            // Dropping into unchaptered - include all scenes in this act
+                            return true;
+                        }
+                    }).length;
                 }
 
                 const newScenes = [...scenes];
@@ -2304,6 +2341,7 @@
 
                 newScenes.splice(targetIndex, 0, removed);
                 setScenes(newScenes);
+                setUnsavedChanges(true);
                 setDraggedScene(null);
             };
 
@@ -2597,7 +2635,7 @@
                                     <>
                                         {saveSuccessMessage && (
                                             <span style={{ color: '#10b981', fontWeight: 500, fontSize: '13px' }}>
-                                                ✓ Saved
+                                                ✓ {saveSuccessMessage}
                                             </span>
                                         )}
                                         {!saveSuccessMessage && unsavedChanges && (
