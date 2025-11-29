@@ -1478,7 +1478,6 @@
                     if (char.relationships) md += `**Relationships:** ${char.relationships}\n\n`;
                     if (char.firstAppearance) md += `**First Appearance:** ${char.firstAppearance}\n\n`;
                     if (char.notes) md += `**Notes:** ${char.notes}\n\n`;
-                    md += '---\n\n';
                 });
                 
                 const filename = `${sanitizeFilename(currentProject.name)}-characters.md`;
@@ -1498,7 +1497,6 @@
                     if (loc.significance) md += `**Story Significance:** ${loc.significance}\n\n`;
                     if (loc.associatedCharacters) md += `**Associated Characters:** ${loc.associatedCharacters}\n\n`;
                     if (loc.notes) md += `**Notes:** ${loc.notes}\n\n`;
-                    md += '---\n\n';
                 });
                 
                 const filename = `${sanitizeFilename(currentProject.name)}-locations.md`;
@@ -1517,11 +1515,10 @@
                 
                 sortedNotes.forEach(note => {
                     md += `## ${note.title || 'Untitled Note'}`;
-                    if (note.isPinned) md += ' 📌';
                     md += '\n\n';
                     
+                    if (note.isPinned) md += `**(Pinned)**\n\n`;
                     if (note.content) md += `${note.content}\n\n`;
-                    md += '---\n\n';
                 });
                 
                 const filename = `${sanitizeFilename(currentProject.name)}-notes.md`;
@@ -1531,8 +1528,7 @@
             const exportFullProjectMarkdown = () => {
                 if (!currentProject) return;
                 let md = `# ${currentProject.name}\n\n`;
-                md += `*Full Project Export*\n\n`;
-                md += `---\n\n`;
+                md += `*Full Project Export*\n\n\n`;
                 
                 // Scenes
                 md += `# Scenes\n\n`;
@@ -1588,7 +1584,10 @@
                 }
                 
                 // Characters
-                md += `\n---\n\n# Characters\n\n`;
+                md += `\n\n\n# Characters\n\n`;
+                if (characters.length === 0) {
+                    md += `*(None)*\n\n`;
+                }
                 characters.forEach(char => {
                     md += `## ${char.name || 'Unnamed Character'}`;
                     if (char.type) md += ` (${char.type.charAt(0).toUpperCase() + char.type.slice(1)})`;
@@ -1602,11 +1601,13 @@
                     if (char.relationships) md += `**Relationships:** ${char.relationships}\n\n`;
                     if (char.firstAppearance) md += `**First Appearance:** ${char.firstAppearance}\n\n`;
                     if (char.notes) md += `**Notes:** ${char.notes}\n\n`;
-                    md += '---\n\n';
                 });
                 
                 // Locations
-                md += `\n# Locations\n\n`;
+                md += `\n\n\n# Locations\n\n`;
+                if (locations.length === 0) {
+                    md += `*(None)*\n\n`;
+                }
                 locations.forEach(loc => {
                     md += `## ${loc.name || 'Unnamed Location'}`;
                     if (loc.type) md += ` (${loc.type.charAt(0).toUpperCase() + loc.type.slice(1)})`;
@@ -1616,24 +1617,25 @@
                     if (loc.significance) md += `**Story Significance:** ${loc.significance}\n\n`;
                     if (loc.associatedCharacters) md += `**Associated Characters:** ${loc.associatedCharacters}\n\n`;
                     if (loc.notes) md += `**Notes:** ${loc.notes}\n\n`;
-                    md += '---\n\n';
                 });
                 
                 // Notes
-                md += `\n# Notes\n\n`;
+                md += `\n\n\n# Notes\n\n`;
                 const sortedNotes = [...notes].sort((a, b) => {
                     if (a.isPinned && !b.isPinned) return -1;
                     if (!a.isPinned && b.isPinned) return 1;
                     return new Date(b.updatedAt) - new Date(a.updatedAt);
                 });
                 
+                if (sortedNotes.length === 0) {
+                    md += `*(None)*\n\n`;
+                }
                 sortedNotes.forEach(note => {
                     md += `## ${note.title || 'Untitled Note'}`;
-                    if (note.isPinned) md += ' 📌';
                     md += '\n\n';
                     
+                    if (note.isPinned) md += `**(Pinned)**\n\n`;
                     if (note.content) md += `${note.content}\n\n`;
-                    md += '---\n\n';
                 });
                 
                 const filename = `${sanitizeFilename(currentProject.name)}-full.md`;
