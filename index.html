@@ -767,14 +767,13 @@
         }
 
         /* Scene Color Classes */
-        .color-gray { background-color: #f3f4f6; border-color: #d1d5db; }
-        .color-red { background-color: #fef2f2; border-color: #fca5a5; }
-        .color-orange { background-color: #fff7ed; border-color: #fdba74; }
-        .color-yellow { background-color: #fefce8; border-color: #fde047; }
-        .color-green { background-color: #f0fdf4; border-color: #86efac; }
-        .color-blue { background-color: #eff6ff; border-color: #93c5fd; }
-        .color-purple { background-color: #faf5ff; border-color: #d8b4fe; }
-        .color-pink { background-color: #fdf2f8; border-color: #f9a8d4; }
+        .color-gray { background-color: #e5e7eb; border-color: #9ca3af; }
+        .color-red { background-color: #fecaca; border-color: #f87171; }
+        .color-orange { background-color: #fed7aa; border-color: #fb923c; }
+        .color-yellow { background-color: #fef08a; border-color: #facc15; }
+        .color-green { background-color: #bbf7d0; border-color: #4ade80; }
+        .color-blue { background-color: #bfdbfe; border-color: #60a5fa; }
+        .color-purple { background-color: #e9d5ff; border-color: #c084fc; }
 
         /* Scenes Table */
         .scenes-table-container {
@@ -871,8 +870,7 @@
             { name: 'Yellow', className: 'color-yellow' },
             { name: 'Green', className: 'color-green' },
             { name: 'Blue', className: 'color-blue' },
-            { name: 'Purple', className: 'color-purple' },
-            { name: 'Pink', className: 'color-pink' }
+            { name: 'Purple', className: 'color-purple' }
         ];
 
         const CHARACTER_TYPES = [
@@ -1162,25 +1160,6 @@
                 return `${year}-${month}-${day} ${hours}-${minutes}-${seconds}`;
             };
 
-            // Save counter functions
-            const getSaveCounter = (projectName) => {
-                const counters = JSON.parse(localStorage.getItem('novelatta_saveCounters') || '{}');
-                return counters[projectName] || 0;
-            };
-
-            const incrementSaveCounter = (projectName) => {
-                const counters = JSON.parse(localStorage.getItem('novelatta_saveCounters') || '{}');
-                counters[projectName] = (counters[projectName] || 0) + 1;
-                localStorage.setItem('novelatta_saveCounters', JSON.stringify(counters));
-                return counters[projectName];
-            };
-
-            const resetSaveCounter = (projectName) => {
-                const counters = JSON.parse(localStorage.getItem('novelatta_saveCounters') || '{}');
-                delete counters[projectName];
-                localStorage.setItem('novelatta_saveCounters', JSON.stringify(counters));
-            };
-
             const performSave = () => {
                 if (!currentProject) return;
                 if (!saveFileName.trim()) {
@@ -1193,29 +1172,15 @@
                 cleanFileName = cleanFileName.replace(/\s+\d{4}-\d{2}-\d{2}\s+\d{2}-\d{2}-\d{2}$/, '');
                 cleanFileName = cleanFileName.replace(/\s*\(\d+\)$/, '');
                 
-                // Check if this is a new project name
-                const isNewName = !currentProject.name || currentProject.name !== cleanFileName;
-                if (isNewName) {
-                    resetSaveCounter(cleanFileName);
-                }
-                
-                const counter = incrementSaveCounter(cleanFileName);
                 const baseFilename = cleanFileName.endsWith('.novelatta') ? 
                     cleanFileName.replace('.novelatta', '') : cleanFileName;
                 const timestamp = getTimestamp();
-                const filename = counter === 1 ? 
-                    `${baseFilename} ${timestamp}.novelatta` : 
-                    `${baseFilename} (${counter - 1}) ${timestamp}.novelatta`;
-                
-                // Set display name to match the actual saved filename (without timestamp for cleaner display)
-                const displayName = counter === 1 ? 
-                    baseFilename : 
-                    `${baseFilename} (${counter - 1})`;
+                const filename = `${baseFilename} ${timestamp}.novelatta`;
                 
                 const updatedProject = {
                     ...currentProject,
                     name: cleanFileName,
-                    displayName: displayName
+                    displayName: `${baseFilename} ${timestamp}`
                 };
                 setCurrentProject(updatedProject);
                 
@@ -1259,22 +1224,14 @@
                     setSaveFileName(currentProject.name);
                     setShowSaveAs(false); // Ensure modal is closed
                     
-                    const counter = incrementSaveCounter(currentProject.name);
                     const baseFilename = currentProject.name.endsWith('.novelatta') ? 
                         currentProject.name.replace('.novelatta', '') : currentProject.name;
                     const timestamp = getTimestamp();
-                    const filename = counter === 1 ? 
-                        `${baseFilename} ${timestamp}.novelatta` : 
-                        `${baseFilename} (${counter - 1}) ${timestamp}.novelatta`;
-                    
-                    // Set display name to match the actual saved filename (without timestamp for cleaner display)
-                    const displayName = counter === 1 ? 
-                        baseFilename : 
-                        `${baseFilename} (${counter - 1})`;
+                    const filename = `${baseFilename} ${timestamp}.novelatta`;
                     
                     setCurrentProject({
                         ...currentProject,
-                        displayName: displayName
+                        displayName: `${baseFilename} ${timestamp}`
                     });
                     
                     const dataStr = JSON.stringify({
@@ -1315,7 +1272,16 @@
                 if (currentProject && currentProject.name && currentProject.name.trim()) {
                     setSaveFileName(currentProject.name);
                     setShowSaveAs(false);
-                    const filename = currentProject.name.endsWith('.novelatta') ? currentProject.name : `${currentProject.name}.novelatta`;
+                    
+                    const baseFilename = currentProject.name.endsWith('.novelatta') ? 
+                        currentProject.name.replace('.novelatta', '') : currentProject.name;
+                    const timestamp = getTimestamp();
+                    const filename = `${baseFilename} ${timestamp}.novelatta`;
+                    
+                    setCurrentProject({
+                        ...currentProject,
+                        displayName: `${baseFilename} ${timestamp}`
+                    });
                     
                     const dataStr = JSON.stringify({
                         name: currentProject.name,
@@ -2995,7 +2961,7 @@
                                     color: '#374151'
                                 }}>
                                     <p style={{ marginBottom: '12px' }}>
-                                        Each time you save, a <strong>new file downloads</strong> to your Downloads folder.
+                                        Each time you save, a <strong>new file downloads</strong> to your Downloads folder with a timestamp.
                                     </p>
                                     
                                     <div style={{ 
@@ -3010,12 +2976,12 @@
                                     }}>
                                         <span style={{ fontSize: '20px' }}>📄</span>
                                         <span style={{ fontFamily: 'monospace', color: '#4f46e5', fontWeight: 600 }}>
-                                            {currentProject?.name || 'MyProject'}.novelatta
+                                            {currentProject?.name || 'MyProject'} {getTimestamp()}.novelatta
                                         </span>
                                     </div>
                                     
                                     <p style={{ marginBottom: '12px' }}>
-                                        If you save multiple times, your browser will add numbers:
+                                        Each save creates a unique timestamped file:
                                     </p>
                                     
                                     <ul style={{ 
@@ -3025,9 +2991,9 @@
                                         fontSize: '13px',
                                         fontFamily: 'monospace'
                                     }}>
-                                        <li>{currentProject?.name || 'MyProject'}.novelatta</li>
-                                        <li>{currentProject?.name || 'MyProject'} (1).novelatta</li>
-                                        <li>{currentProject?.name || 'MyProject'} (2).novelatta</li>
+                                        <li>{currentProject?.name || 'MyProject'} 2024-11-28 14-30-15.novelatta</li>
+                                        <li>{currentProject?.name || 'MyProject'} 2024-11-28 15-45-32.novelatta</li>
+                                        <li>{currentProject?.name || 'MyProject'} 2024-11-28 16-12-08.novelatta</li>
                                     </ul>
                                     
                                     <div style={{
@@ -3040,7 +3006,7 @@
                                     }}>
                                         <span style={{ fontSize: '16px' }}>💡</span>
                                         <div style={{ fontSize: '13px', color: '#78350f' }}>
-                                            <strong>Tip:</strong> Delete old numbered versions to keep your Downloads folder organized.
+                                            <strong>Tip:</strong> Delete older timestamped versions to keep your Downloads folder organized.
                                         </div>
                                     </div>
                                 </div>
