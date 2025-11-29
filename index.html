@@ -1085,21 +1085,6 @@
                         e.preventDefault();
                         performQuickSave();
                     }
-                    // Ctrl+Shift+S or Cmd+Shift+S - Save As
-                    else if ((e.ctrlKey || e.metaKey) && e.key === 's' && e.shiftKey) {
-                        e.preventDefault();
-                        saveAsNewFile();
-                    }
-                    // Ctrl+N or Cmd+N - New Project
-                    else if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
-                        e.preventDefault();
-                        setShowNewProject(true);
-                    }
-                    // Ctrl+O or Cmd+O - Open Project
-                    else if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
-                        e.preventDefault();
-                        handleOpenProject();
-                    }
                 };
                 
                 document.addEventListener('keydown', handleKeyDown);
@@ -1438,8 +1423,9 @@
                         md += `### Chapter ${chapterNum}: ${chapter.name}\n\n`;
                         
                         const chapterScenes = actScenes.filter(s => s.chapterId === chapter.id);
-                        chapterScenes.forEach(scene => {
-                            md += `#### ${scene.title || 'Untitled Scene'} (${scene.type === 'action' ? 'Action' : 'Reaction'})\n\n`;
+                        chapterScenes.forEach((scene, index) => {
+                            const sceneNum = `${chapterNum}-${index + 1}`;
+                            md += `#### ${sceneNum}: ${scene.title || 'Untitled Scene'} (${scene.type === 'action' ? 'Action' : 'Reaction'})\n\n`;
                             if (scene.type === 'action') {
                                 if (scene.objective) md += `- **Objective:** ${scene.objective}\n`;
                                 if (scene.obstacle) md += `- **Obstacle:** ${scene.obstacle}\n`;
@@ -1456,7 +1442,7 @@
                     
                     const unchapteredScenes = actScenes.filter(s => !s.chapterId);
                     if (unchapteredScenes.length > 0) {
-                        md += `### Unchaptered Scenes\n\n`;
+                        md += `### Unchaptered (Act ${act})\n\n`;
                         unchapteredScenes.forEach(scene => {
                             md += `#### ${scene.title || 'Untitled Scene'} (${scene.type === 'action' ? 'Action' : 'Reaction'})\n\n`;
                             if (scene.type === 'action') {
@@ -1564,8 +1550,9 @@
                         md += `### Chapter ${chapterNum}: ${chapter.name}\n\n`;
                         
                         const chapterScenes = actScenes.filter(s => s.chapterId === chapter.id);
-                        chapterScenes.forEach(scene => {
-                            md += `#### ${scene.title || 'Untitled Scene'} (${scene.type === 'action' ? 'Action' : 'Reaction'})\n\n`;
+                        chapterScenes.forEach((scene, index) => {
+                            const sceneNum = `${chapterNum}-${index + 1}`;
+                            md += `#### ${sceneNum}: ${scene.title || 'Untitled Scene'} (${scene.type === 'action' ? 'Action' : 'Reaction'})\n\n`;
                             if (scene.type === 'action') {
                                 if (scene.objective) md += `- **Objective:** ${scene.objective}\n`;
                                 if (scene.obstacle) md += `- **Obstacle:** ${scene.obstacle}\n`;
@@ -1582,7 +1569,7 @@
                     
                     const unchapteredScenes = actScenes.filter(s => !s.chapterId);
                     if (unchapteredScenes.length > 0) {
-                        md += `### Unchaptered Scenes\n\n`;
+                        md += `### Unchaptered (Act ${act})\n\n`;
                         unchapteredScenes.forEach(scene => {
                             md += `#### ${scene.title || 'Untitled Scene'} (${scene.type === 'action' ? 'Action' : 'Reaction'})\n\n`;
                             if (scene.type === 'action') {
@@ -1661,16 +1648,18 @@
 
             const exportScenesCSV = () => {
                 if (!currentProject) return;
-                const headers = ['Act', 'Chapter', 'ChapterName', 'Title', 'Type', 'Objective', 'Obstacle', 'Outcome', 'Emotion', 'Deliberation', 'Decision', 'Color', 'Notes'];
+                const headers = ['Act', 'Chapter', 'Scene_Number', 'ChapterName', 'Title', 'Type', 'Objective', 'Obstacle', 'Outcome', 'Emotion', 'Deliberation', 'Decision', 'Color', 'Notes'];
                 let csv = headers.join(',') + '\n';
                 
                 scenes.forEach(scene => {
                     const chapterNum = scene.chapterId ? getGlobalChapterNumber(scene.chapterId) : '';
                     const chapterName = scene.chapterId ? chapters.find(c => c.id === scene.chapterId)?.name || '' : '';
+                    const sceneNum = getSceneNumber(scene);
                     
                     const row = [
                         scene.act,
                         chapterNum,
+                        sceneNum ? `="${sceneNum}"` : '',
                         `"${chapterName.replace(/"/g, '""')}"`,
                         `"${(scene.title || '').replace(/"/g, '""')}"`,
                         scene.type,
@@ -1893,13 +1882,14 @@
                         html += `<h4>Chapter ${chapterNum}: ${escapeHTML(chapter.name)}</h4>\n`;
                         
                         const chapterScenes = actScenes.filter(s => s.chapterId === chapter.id);
-                        chapterScenes.forEach(scene => {
+                        chapterScenes.forEach((scene, index) => {
+                            const sceneNum = `${chapterNum}-${index + 1}`;
                             const typeBadge = scene.type === 'action' ? 
                                 '<span class="type-badge type-action">Action</span>' : 
                                 '<span class="type-badge type-reaction">Reaction</span>';
                             
                             html += `<div class="scene">\n`;
-                            html += `<h4>${escapeHTML(scene.title) || 'Untitled Scene'}${typeBadge}</h4>\n`;
+                            html += `<h4>${sceneNum}: ${escapeHTML(scene.title) || 'Untitled Scene'}${typeBadge}</h4>\n`;
                             
                             if (scene.type === 'action') {
                                 if (scene.objective) html += `<div class="field-label">Objective</div><div class="field-value">${escapeHTML(scene.objective)}</div>\n`;
@@ -1917,7 +1907,7 @@
                     
                     const unchapteredScenes = actScenes.filter(s => !s.chapterId);
                     if (unchapteredScenes.length > 0) {
-                        html += `<h4>Unchaptered Scenes</h4>\n`;
+                        html += `<h4>Unchaptered (Act ${act})</h4>\n`;
                         unchapteredScenes.forEach(scene => {
                             const typeBadge = scene.type === 'action' ? 
                                 '<span class="type-badge type-action">Action</span>' : 
@@ -2399,6 +2389,27 @@
                 return index >= 0 ? index + 1 : '—';
             };
 
+            const getSceneNumber = (scene) => {
+                // Unchaptered scenes don't get numbers
+                if (!scene.chapterId) return '';
+                
+                // Safety check: ensure scenes array exists
+                if (!scenes || !Array.isArray(scenes)) return '';
+                
+                // Get the chapter number
+                const chapterNum = getGlobalChapterNumber(scene.chapterId);
+                if (chapterNum === '—') return '';
+                
+                // Get all scenes in this chapter
+                const chapterScenes = scenes.filter(s => s.chapterId === scene.chapterId);
+                
+                // Find position of this scene within the chapter
+                const scenePosition = chapterScenes.findIndex(s => s.id === scene.id) + 1;
+                
+                // Return formatted number: ChapterNum-ScenePosition
+                return `${chapterNum}-${scenePosition}`;
+            };
+
             const getScenesInOrder = (scenesToOrder) => {
                 const orderedScenes = [];
                 
@@ -2555,7 +2566,6 @@
                                                 onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                                             >
                                                 <span>+ New Project</span>
-                                                <span style={{ fontSize: '11px', color: '#9ca3af' }}>Ctrl+N</span>
                                             </button>
                                             <button
                                                 onClick={() => { handleOpenProject(); setShowFileMenu(false); }}
@@ -2576,7 +2586,6 @@
                                                 onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                                             >
                                                 <span>📂 Open Project...</span>
-                                                <span style={{ fontSize: '11px', color: '#9ca3af' }}>Ctrl+O</span>
                                             </button>
                                             <div style={{ borderTop: '1px solid #e5e7eb', margin: '8px 0' }}></div>
                                             <button
@@ -2623,7 +2632,6 @@
                                                 onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                                             >
                                                 <span>💾 Save As...</span>
-                                                <span style={{ fontSize: '11px', color: '#9ca3af' }}>Ctrl+Shift+S</span>
                                             </button>
                                             <div style={{ borderTop: '1px solid #e5e7eb', margin: '8px 0' }}></div>
                                             <button
@@ -3600,7 +3608,6 @@
                                                 <li>Lets you rename before saving</li>
                                                 <li>Creates a copy with new name</li>
                                                 <li>Useful for creating variants</li>
-                                                <li>Keyboard shortcut: <strong>Ctrl+Shift+S</strong></li>
                                             </ul>
                                         </div>
 
@@ -4137,6 +4144,7 @@
                                                                         <SceneCard
                                                                             key={scene.id}
                                                                             scene={scene}
+                                                                            getSceneNumber={getSceneNumber}
                                                                             isExpanded={expandedCard === scene.id}
                                                                             isDragging={draggedScene?.id === scene.id}
                                                                             onToggleExpand={() => setExpandedCard(expandedCard === scene.id ? null : scene.id)}
@@ -4174,7 +4182,7 @@
                                                             >
                                                                 <div className="chapter-header-row">
                                                                     <div className="chapter-title">
-                                                                        Unchaptered Scenes
+                                                                        Unchaptered (Act {act})
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -4183,6 +4191,7 @@
                                                                     <SceneCard
                                                                         key={scene.id}
                                                                         scene={scene}
+                                                                        getSceneNumber={getSceneNumber}
                                                                         isExpanded={expandedCard === scene.id}
                                                                         isDragging={draggedScene?.id === scene.id}
                                                                         onToggleExpand={() => setExpandedCard(expandedCard === scene.id ? null : scene.id)}
@@ -4224,6 +4233,7 @@
                                                 }}
                                                 onDelete={deleteScene}
                                                 getChapterNumber={getGlobalChapterNumber}
+                                                getSceneNumber={getSceneNumber}
                                             />
                                         )}
                                     </>
@@ -4665,7 +4675,9 @@
         }
 
         // Scene components
-        function SceneCard({ scene, isExpanded, isDragging, onToggleExpand, onEdit, onDelete, onDragStart, onDragOver, onDrop }) {
+        function SceneCard({ scene, getSceneNumber, isExpanded, isDragging, onToggleExpand, onEdit, onDelete, onDragStart, onDragOver, onDrop }) {
+            const sceneNumber = getSceneNumber ? getSceneNumber(scene) : '';
+            
             return (
                 <div 
                     className={`scene-card ${scene.color} ${isDragging ? 'dragging' : ''}`}
@@ -4677,6 +4689,7 @@
                     <div className="scene-header">
                         <div className="scene-title-section">
                             <div className="scene-title">
+                                {sceneNumber && <span style={{ color: '#6b7280', marginRight: '8px' }}>{sceneNumber}</span>}
                                 {scene.title || 'Untitled Scene'}
                             </div>
                             <div className="scene-type">
@@ -4793,7 +4806,7 @@
 
 
         // Scenes List component
-        function ScenesList({ scenes, chapters, expandedRow, onToggleExpand, onEdit, onDelete, getChapterNumber }) {
+        function ScenesList({ scenes, chapters, expandedRow, onToggleExpand, onEdit, onDelete, getChapterNumber, getSceneNumber }) {
             const truncate = (text, length) => {
                 if (!text) return '—';
                 return text.length > length ? text.substring(0, length) + '...' : text;
@@ -4815,6 +4828,7 @@
                             <tr>
                                 <th style={{ width: '40px' }}>Act</th>
                                 <th style={{ width: '45px' }}>Ch#</th>
+                                <th style={{ width: '55px' }}>Scene#</th>
                                 <th style={{ width: '180px' }}>Title</th>
                                 <th style={{ width: '45px', textAlign: 'center' }}>Type</th>
                                 <th style={{ width: '200px' }}>Field 1</th>
@@ -4831,6 +4845,9 @@
                                         <td>{scene.act}</td>
                                         <td className="chapter-number">
                                             {getChapterNumber(scene.chapterId)}
+                                        </td>
+                                        <td style={{ color: '#6b7280' }}>
+                                            {getSceneNumber ? getSceneNumber(scene) : ''}
                                         </td>
                                         <td 
                                             style={{ cursor: 'pointer', fontWeight: 500 }}
